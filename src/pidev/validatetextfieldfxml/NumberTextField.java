@@ -1,0 +1,29 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package pidev.validatetextfieldfxml;
+
+import javafx.scene.control.TextField;
+
+/**
+ *
+ * @author Mariem
+ */
+
+public class NumberTextField extends TextField {
+    public NumberTextField(){
+    this.setPromptText("Enter Only Number");}
+    
+    
+    @Override
+   public void replaceText(int i,int i1,String s){
+       if (s.matches("[0-9]")|| s.isEmpty())
+   super.replaceText(i, i1, s);}
+   
+    @Override
+   public void replaceSelection(String s){
+   super.replaceSelection(s);}
+    
+}

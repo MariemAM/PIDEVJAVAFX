@@ -10,22 +10,31 @@ package pidev.entities;
  * @author Mariem
  */
 public class Produit {
+
     private int id;
     private String nom;
     private int qte;
     private int prix;
     private Double prix_promo;
-    
 
     public Produit(int id) {
         this.id = id;
     }
 
-    public Produit(int id, int qte,int prix, Double prix_promo) {
+    public Produit(int id, String nom) {
+        this.id = id;
+        this.nom = nom;
+    }
+
+    public Produit(int id, int qte, int prix, Double prix_promo) {
         this.id = id;
         this.qte = qte;
-        this.prix=prix;
+        this.prix = prix;
         this.prix_promo = prix_promo;
+    }
+
+    public Produit() {
+
     }
 
     public void setId(int id) {
@@ -47,7 +56,7 @@ public class Produit {
     public void setPrix_promo(Double prix_promo) {
         this.prix_promo = prix_promo;
     }
-  
+
     public int getId() {
         return id;
     }
@@ -67,13 +76,10 @@ public class Produit {
     public String getNom() {
         return nom;
     }
-    
 
     @Override
     public String toString() {
-        return "Produit{" + "id=" + id + ", qte=" + qte + ", prix=" + prix + ", prix_promo=" + prix_promo + '}';
+        return "Produit{" + "id=" + id + ", nom=" + nom + ", qte=" + qte + ", prix=" + prix + ", prix_promo=" + prix_promo + '}';
     }
-    
-    
-    
+
 }

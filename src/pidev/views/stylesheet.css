@@ -13,7 +13,7 @@
 .tree-table-view .column-header {
     -fx-size: 65;
     -fx-border-style: null;
-    -fx-border-color: blueviolet;
+    -fx-border-color: grey;
     -fx-border-width: 0 0 2 0;
     -fx-background-color: transparent;
 }
@@ -43,10 +43,12 @@
     -fx-border-color: transparent; /* Vertical Lines*/
     -fx-border-width: 1;
 }
-form_ajout{
+form_add{
+   
     -fx-background-color: #FFF8E6;
-    
 }
+    
+
 
 
 

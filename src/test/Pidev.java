@@ -10,6 +10,7 @@ import pidev.entities.Produit;
 import pidev.entities.Promotion;
 import pidev.DAL.LgPromotionDao;
 import pidev.DAL.PromotionDao;
+import pidev.entities.LignePromotion;
 
 /**
  *
@@ -25,24 +26,25 @@ public class Pidev {
 
         PromotionDao srvP = new PromotionDao();
         LgPromotionDao srvLP = new LgPromotionDao();
-
-        Promotion pr = new Promotion(1, "Nouvel an", 34);
-        Promotion p2 = new Promotion(2, "Nnn", 34);
-        Promotion p3 = new Promotion(4, "ma", 34);
+        Promotion p3 = new Promotion( 2,"mariem", 34);
         
         //Promotion p3=new Promotion(4,"ma",34);
-        Produit pdt = new Produit(1);
-
-        // srvP.deletePromo(1);
+        Produit pdt = new Produit(2);
+       // System.out.println(p3.toString());
+         // System.out.println(srvLP.returnProducts());
+        // srvP.deletePromo("adir");
         //srvP.create(p3);
-        //srvP.updatePromo(3,"Black Friday",50);
+       // srvP.updatePromo("Black Friday",30);
         //srvP.findPromobyname("Black Friday");
-        //srvP.findLikePromo("black ");
-       srvP.listPromo();
+        //srvP.findLikePromo("Black");
+       //srvP.listPromo();
         //**************************Lgpromotion*************************************//
-        
-        //srvLP.create(7,pdt,p2,1);
-        //srvLP.listLgPromo();
+       // srvLP.returnLgPromo(2);
+       LignePromotion p=new LignePromotion(pdt,p3,1);//
+       LignePromotion p2=new LignePromotion(pdt,p3,1);
+       
+        srvLP.create(p);
+        //srvLP.returnAll();
         //srvLP.deleteLgPromo(5);
        // srvLP.updateLgPromo(2,1,pdt,p2);
     }

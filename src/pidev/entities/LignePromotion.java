@@ -12,38 +12,53 @@ package pidev.entities;
  */
 public class LignePromotion {
     private int id;
-    private int produit_id;
-    private int promotion_id;
+    private  Produit p;
+    private Promotion promo;
     private int quantite;
     
 
     public LignePromotion() {
+        
     }
 
-    public LignePromotion(int id, int produit_id, int promotion_id, int quantite) {
+    public LignePromotion(int id, Produit p, Promotion promo, int quantite) {
         this.id = id;
-        this.produit_id = produit_id;
-        this.promotion_id = promotion_id;
+        this.p = p;
+        this.promo = promo;
         this.quantite = quantite;
     }
 
-    public LignePromotion(int produit_id, int promotion_id, int quantite) {
-        this.produit_id = produit_id;
-        this.promotion_id = promotion_id;
+    public LignePromotion(Produit p, Promotion promo, int quantite) {
+        this.p = p;
+        this.promo = promo;
         this.quantite = quantite;
     }
+
+    public Produit getP() {
+        return p;
+    }
+
+    public Promotion getPromo() {
+        return promo;
+    }
+
+    public void setP(Produit p) {
+        this.p = p;
+    }
+
+    public void setPromo(Promotion promo) {
+        this.promo = promo;
+    }
+
+    
 
     public int getId() {
         return id;
     }
 
-    public int getProduit_id() {
-        return produit_id;
-    }
+   
 
-    public int getPromotion_id() {
-        return promotion_id;
-    }
+    
 
     public int getQuantite() {
         return quantite;
@@ -53,22 +68,18 @@ public class LignePromotion {
         this.id = id;
     }
 
-    public void setProduit_id(int produit_id) {
-        this.produit_id = produit_id;
-    }
-
-    public void setPromotion_id(int promotion_id) {
-        this.promotion_id = promotion_id;
-    }
-
+   
+   
     public void setQuantite(int quantite) {
         this.quantite = quantite;
     }
 
     @Override
     public String toString() {
-        return "LignePromotion{" + "id=" + id + ", produit_id=" + produit_id + ", promotion_id=" + promotion_id + ", quantite=" + quantite + '}';
+        return "LignePromotion{" + "id=" + id + ", p=" + p + ", promo=" + promo + ", quantite=" + quantite + '}';
     }
+
+    
  
     
 }

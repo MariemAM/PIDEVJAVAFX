@@ -39,15 +39,15 @@ public class LgPromotionDao implements IServiceLgPromoDao {
         con = Connexion.getInstance().getCnx();
     }
 
-    public void listLgPromo() {
+    public void returnAll() {
         query = "SELECT * FROM ligne_promotion lp, promotion p,produit pdt where lp.Promotion_id=p.id_promo and lp.produit_id=pdt.id_pdt ";
         try {
             stmt = con.createStatement();
             RS = stmt.executeQuery(query);
             while (RS.next()) {
-                lsLgPromo.add(new LignePromotion(RS.getInt("id"), RS.getInt("produit_id"), RS.getInt("Promotion_id"), RS.getInt("quantite")
-                ));
-                lsPromo.add(new Promotion(RS.getInt("id_promo"), RS.getString("nom"), RS.getTimestamp("date_debut").toString(), RS.getTimestamp("date_fin").toString(), RS.getInt("taux_reduction")
+                //lsLgPromo.add(new LignePromotion(RS.getInt("id"), RS.getInt("produit_id"), RS.getInt("Promotion_id"), RS.getInt("quantite")
+               // ));
+                lsPromo.add(new Promotion(RS.getInt("id_promo"), RS.getString("nom"), RS.getDate("date_debut"), RS.getDate("date_fin"), RS.getInt("taux_reduction")
                 ));
                 lspdt.add(new Produit(RS.getInt("id_pdt"), RS.getInt("qte"), RS.getInt("prix"), RS.getDouble("$prix_promo")
                 ));
@@ -68,37 +68,74 @@ public class LgPromotionDao implements IServiceLgPromoDao {
             }
         }
     }
+    public List<String> returnLgPromo(int id_promo){
+        List<String> ls=new ArrayList<>();
+        query="select nomp,qte,prix,prix_promo,quantite from ligne_promotion lp,produit p where p.id_pdt=lp.produit_id and lp.Promotion_id="+id_promo;
+            try {//traja3lek les produit eli fil promotion
+                stmt = con.createStatement();
+                try {
+                    RS = stmt.executeQuery(query);
+                } catch (SQLException ex) {
+                    Logger.getLogger(LgPromotionDao.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                while (RS.next()) {
+                    String s= RS.getString("nomp");
+                    int  qs=RS.getInt("qte");
+                    int p=RS.getInt("prix");
+                    Double pp=RS.getDouble("prix_promo");
+                    int q=RS.getInt("quantite");
+                    String all="Produit: "+s+" ,Stock: "+qs+" ,Prix: "+p+" ,Prix Promo: "+pp+" ,Qte Promo: "+q;
+                    ls.add(all);
+                    
+                }
+                ls.stream().forEach((String s) -> {System.out.println(s.toString()); });
+            } catch (SQLException ex) {
+                Logger.getLogger(LgPromotionDao.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return ls;
+       }
+    
+       
+       
+    
 
-    public void create(int id, Produit p, Promotion p1, int qte) {
+    public void create( LignePromotion lp) {
+        //https://www.youtube.com/watch?v=NC6bY2oJr7s
         try {
 
-            query = "select * from ligne_promotion where produit_id=" + p.getId() + " and Promotion_id=" + p1.getId();
+            query = "select * from ligne_promotion where produit_id=" + lp.getP().getId() + " and Promotion_id=" + lp.getPromo().getId();
             stmt = con.createStatement();
             RS = stmt.executeQuery(query);
             RS.last();
             int nbrRow = RS.getRow();
             if (nbrRow == 0) {
-                if ((verifUpdateProduct(p, p1, qte))) {
-                    query = "INSERT INTO ligne_promotion VALUES (?, ?, ?, ?)";
-                    ps = con.prepareStatement(query);
-                    ps.setInt(1, id);
-                    ps.setInt(2, p.getId());
-                    ps.setInt(3, qte);
-                    ps.setInt(4, p1.getId());
+                if ((verifUpdateProduct(lp))) {
+                    query = "INSERT INTO ligne_promotion VALUES ( ?, ?, ?, ?)";
+                   //try (PreparedStatement ps = con.prepareStatement(query,Statement.RETURN_GENERATED_KEYS))
+                          // {
+                    ps = con.prepareStatement(query);   
+                    ps.setInt(1,lp.getId());
+                    ps.setInt(2, lp.getP().getId());
+                    ps.setInt(3,lp.getQuantite() );
+                    ps.setInt(4, lp.getPromo().getId());
                     ps.executeUpdate();
+                    //ResultSet RS=ps.getGeneratedKeys();
+                   //while (RS.next()){RS.getInt(1);}
                     System.out.println("Ligne promotion created and stock and price updated");
+                          // }catch(SQLException e){System.out.println(e.getMessage());}
                 }
-            } else if (verifUpdateProduct(p, p1, qte)) {
-                query = "SELECT * FROM ligne_promotion where Promotion_id=" + p1.getId() + " and produit_id=" + p.getId();
+            } else if (verifUpdateProduct(lp)) {
+                query = "SELECT * FROM ligne_promotion where Promotion_id=" + lp.getPromo().getId() + " and produit_id=" + lp.getP().getId();
                 stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                         ResultSet.CONCUR_UPDATABLE);
                 RS = stmt.executeQuery(query);
                 while (RS.next()) {
                     int qtlp = RS.getInt("quantite");
-                    RS.updateInt("quantite", qtlp + qte);
+                    RS.updateInt("quantite", qtlp + lp.getQuantite());
                     RS.updateRow();
                 }
-                System.out.println("ligne promotion with promotion id= " + p1.getId() + "and product id= " + p.getId() + " already exist \n stock updated");
+               System.out.println("ligne promotion with promotion id= " + lp.getPromo().getId() + "and product id= " + lp.getP().getId() + " already exist \n stock updated");
 
             }
 
@@ -114,22 +151,39 @@ public class LgPromotionDao implements IServiceLgPromoDao {
             }
         }
     }
+    public List<Produit> returnProducts(){
+        query="select nomp,id_pdt from produit";
+        List<Produit> lpdt=new ArrayList<>();
+        try{
+            stmt = con.createStatement();
+            RS = stmt.executeQuery(query);
+            
+            while (RS.next()) {
+            Produit p=new Produit(RS.getInt("id_pdt"),RS.getString("nomp"));
+            lpdt.add(p);
+            }
+        }
+        catch(SQLException e){
+         System.out.println(e.getMessage());
+        }
+        return lpdt;
+    }
 
-    public boolean verifUpdateProduct(Produit p, Promotion promo, int qte) throws SQLException {
+    public boolean verifUpdateProduct(LignePromotion lp) throws SQLException {
 
         boolean test = false;
-        query = "select * from produit where id_pdt=" + p.getId();
+        query = "select * from produit where id_pdt=" + lp.getP().getId();
        
         stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
         RS = stmt.executeQuery(query);
 
         while (RS.next()) {
             int qtestock = RS.getInt("qte");
-            if (qtestock >= qte && qtestock != 0) {
+            if (qtestock >= lp.getQuantite() && qtestock != 0) {
                 int prix = RS.getInt("prix");
-                RS.updateInt("qte", qtestock - qte);
+                RS.updateInt("qte", qtestock - lp.getQuantite());
                 RS.updateRow();
-                RS.updateInt("$prix_promo", (promo.getTaux_reduction() * prix) / 100);
+                RS.updateInt("prix_promo", (lp.getPromo().getTaux_reduction() * prix) / 100);
                 RS.updateRow();
                 test = true;
 
@@ -154,15 +208,15 @@ public class LgPromotionDao implements IServiceLgPromoDao {
         }
     }
     //test prix verifUpdateProduct
-    public void updateLgPromo(int id, int qte,Produit p,Promotion promo) {
+    public void updateLgPromo(LignePromotion lp) {//int id, int qte,Produit p,Promotion promo
         try {
             
-            if(verifUpdateProduct(p,promo,qte)){
+            if(verifUpdateProduct(lp)){//p,promo,qte
             query = "update ligne_promotion set quantite =? where id=?";
             ps = con.prepareStatement(query);
             ps.executeQuery();
-            ps.setInt(1,p.getQte());
-            ps.setInt(2, id);
+            ps.setInt(1,lp.getQuantite());//p.getQte()
+            ps.setInt(2,lp.getId() );//id
             ps.executeUpdate();
             System.out.println("Ligne Promotion updated ");
             }
@@ -172,6 +226,4 @@ public class LgPromotionDao implements IServiceLgPromoDao {
         }
 
     }
-    //methode pour lister les promotions eli mawjoud fiha produit entree un +
-    //methode pour lister les produit eli  fihom promotion
 }
