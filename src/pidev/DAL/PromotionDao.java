@@ -7,10 +7,12 @@ package pidev.DAL;
 
 import pidev.interfaces.IServicePromoDao;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,7 +43,8 @@ public class PromotionDao implements IServicePromoDao {
     }
 
     public void create(Promotion p) {
-       
+       Timestamp ts = Timestamp.valueOf(p.getDate_debut());
+       Timestamp ts2 = Timestamp.valueOf(p.getDate_fin());
         try{
         if(findPromobyname(p.getNom())){
             System.out.println("promotion already exist");}
@@ -49,8 +52,8 @@ public class PromotionDao implements IServicePromoDao {
             query = "INSERT INTO promotion VALUES (?,?, ?, ?, ?)";
             ps = con.prepareStatement(query);
             ps.setInt(1, p.getId());
-            ps.setDate(2, p.getDate_debut()) ;
-            ps.setDate(3, p.getDate_fin());
+            ps.setTimestamp(2,ts ) ;
+            ps.setTimestamp(3, ts2);
             ps.setInt(4, p.getTaux_reduction());
             ps.setString(5, p.getNom());
 
@@ -68,32 +71,30 @@ public class PromotionDao implements IServicePromoDao {
        
         List<Promotion> lsPromo = new ArrayList<Promotion>();
         lsPromo.clear();
-        query = "SELECT * FROM promotion ORDER BY id_promo ";//pagination
+        query = "SELECT * FROM promotion ORDER BY id_promo ";//LIMIT 5 pagination
         try {
 
             stmt = con.createStatement();
             RS = stmt.executeQuery(query);
             while (RS.next()) {
-           //Timestamp ts=
+           
              
-            //Promotion p=new Promotion();
-            //p.setId(RS.getInt("id_promo"));
-            //p.setNom(RS.getString("nom"));
-            /*******************TYPE TIMESTAMP***************************/
-            //Timestamp ts1=RS.getTimestamp("date_debut");
-            //Calendar calendar=Calendar.getInstance(Locale.getDefault());
-            //calendar.setTimeInMillis(ts1.getTime());
-            //String dateString=new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(calendar.getTime());
-           // p.setDate_debut(dateString);
+            Promotion p=new Promotion();
+            p.setId(RS.getInt("id_promo"));
+            p.setNom(RS.getString("nom"));
             
-            //Timestamp ts2=RS.getTimestamp("date_fin");
-            //Calendar calendar2=Calendar.getInstance(Locale.GERMANY);
-            //calendar.setTimeInMillis(ts2.getTime());
-            //String dateString2=new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(calendar2.getTime());
-           // p.setDate_fin(dateString2);
-           // p.setTaux_reduction(RS.getInt("taux_reduction"));
-            Button btn=new Button();
-            Promotion p = new Promotion(RS.getInt("id_promo"),RS.getString("nom"),RS.getDate("date_debut"),RS.getDate("date_fin"),RS.getInt("taux_reduction"));
+            Timestamp ts1=RS.getTimestamp("date_debut");
+            Calendar calendar=Calendar.getInstance(Locale.getDefault());
+            calendar.setTimeInMillis(ts1.getTime());
+            String dateString=new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(calendar.getTime());
+            p.setDate_debut(dateString);
+            
+            Timestamp ts2=RS.getTimestamp("date_fin");
+            Calendar calendar2=Calendar.getInstance(Locale.getDefault());
+            calendar.setTimeInMillis(ts2.getTime());
+            String dateString2=new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(calendar2.getTime());
+            p.setDate_fin(dateString2);
+            p.setTaux_reduction(RS.getInt("taux_reduction"));
             lsPromo.add(p);
 
             }
@@ -134,7 +135,7 @@ return lsPromo;
         } 
     }
     
-   public Promotion FindOne(int id_promo){
+   public Promotion returnPromo(int id_promo){
          Promotion p=new Promotion();
         query = "SELECT * FROM promotion WHERE id_promo=" + id_promo ;
         try {
@@ -145,8 +146,8 @@ return lsPromo;
             if (nbrRow != 0 ) {
                 p.setId(RS.getInt("id_promo"));
                         p.setNom(RS.getString("nom"));
-                        p.setDate_debut(RS.getDate("date_debut"));
-                        p.setDate_fin(RS.getDate("date_fin"));
+                        p.setDate_debut(RS.getTimestamp("date_debut").toString());
+                        p.setDate_fin(RS.getTimestamp("date_fin").toString());
                         p.setTaux_reduction(RS.getInt("taux_reduction"));
                // System.out.println(p.toString());
                
@@ -173,16 +174,19 @@ return lsPromo;
    }
 
 
-    public void updatePromo( String nom, int tx_red) {
-        
+    public void updatePromo( String nom, int tx_red,String d1,String d2) {
+        Timestamp ts = Timestamp.valueOf(d1);
+       Timestamp ts2 = Timestamp.valueOf(d2);
         int id=InfoPromo(nom).getId();
         try {
-            query = "update promotion set nom =?, taux_reduction=? where id_promo=?";
+            query = "update promotion set nom =?,date_debut=?,date_fin=?, taux_reduction=? where id_promo=?";
             ps = con.prepareStatement(query);
            // ps.executeQuery();
             ps.setString(1, nom);
-            ps.setInt(2, tx_red);
-            ps.setInt(3, id);
+            ps.setTimestamp(2, ts);
+            ps.setTimestamp(3, ts2);
+            ps.setInt(4, tx_red);
+            ps.setInt(5, id);
             ps.executeUpdate();
             //System.out.println("Promotion updated ");
         } catch (SQLException ex) {
@@ -202,8 +206,8 @@ return lsPromo;
             if (nbrRow != 0 ) {
                 p.setId(RS.getInt("id_promo"));
                         p.setNom(RS.getString("nom"));
-                        p.setDate_debut(RS.getDate("date_debut"));
-                        p.setDate_fin(RS.getDate("date_fin"));
+                        p.setDate_debut(RS.getTimestamp("date_debut").toString());
+                        p.setDate_fin(RS.getTimestamp("date_fin").toString());
                         p.setTaux_reduction(RS.getInt("taux_reduction"));
                 System.out.println(p.toString());
                 test=true;
@@ -239,8 +243,8 @@ return p;
             if (nbrRow != 0 ) {
                 p.setId(RS.getInt("id_promo"));
                         p.setNom(RS.getString("nom"));
-                        p.setDate_debut(RS.getDate("date_debut"));
-                        p.setDate_fin(RS.getDate("date_fin"));
+                        p.setDate_debut(RS.getTimestamp("date_debut").toString());
+                        p.setDate_fin(RS.getTimestamp("date_fin").toString());
                         p.setTaux_reduction(RS.getInt("taux_reduction"));
                 System.out.println(p.toString());
                 test=true;
@@ -275,8 +279,8 @@ return test;
             while (RS.next()) {
                  lstpr.add(new Promotion(RS.getInt("id_promo")
                          ,RS.getString("nom")
-                         ,RS.getDate("date_debut")
-                         ,RS.getDate("date_fin")
+                         ,RS.getTimestamp("date_debut").toString()
+                         ,RS.getTimestamp("date_fin").toString()
                          ,RS.getInt("taux_reduction")));
                          
               

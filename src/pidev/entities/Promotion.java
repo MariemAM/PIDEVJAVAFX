@@ -6,8 +6,7 @@
 package pidev.entities;
 
 
-import java.sql.Date;
-import javafx.scene.control.Button;
+
 
 
 /**
@@ -17,10 +16,10 @@ import javafx.scene.control.Button;
 public class Promotion {
     private int id;
     private String nom;
-    private Date date_debut;
-    private Date date_fin;
+    private String date_debut;
+    private String date_fin;
     private int taux_reduction;
-    private Button button;
+
     
    
 
@@ -33,24 +32,19 @@ public class Promotion {
         this.taux_reduction = taux_reduction;
     }
 
-   public Promotion(String nom, Date date_debut, Date date_fin, int taux_reduction) {
+   public Promotion(String nom, String date_debut, String date_fin, int taux_reduction) {
         this.nom = nom;
         this.date_debut = date_debut;
         this.date_fin = date_fin;
         this.taux_reduction = taux_reduction;
-        //this.button=new Button("Add Product");
-       // this.button=button;
-        //this.button.setText("Add Product");
     }   
-    public Promotion(int id, String nom, Date date_debut, Date date_fin, int taux_reduction) {
+    public Promotion(int id, String nom, String date_debut, String date_fin, int taux_reduction) {
         this.id = id;
         this.nom = nom;
         this.date_debut = date_debut;
         this.date_fin = date_fin;
         this.taux_reduction = taux_reduction;
-        //this.button=new Button("Add Product");
-        //this.button=button;
-        //this.button.setText("Add Product");
+     
         
     }
 
@@ -61,17 +55,11 @@ public class Promotion {
     public String getNom() {
         return nom;
     }
-
-    /**
-     *
-     * @return
-     */
-    
-    public Date getDate_debut() {
+    public String getDate_debut() {
         return date_debut;
     }
 
-    public Date getDate_fin() {
+    public String getDate_fin() {
         return date_fin;
     }
 
@@ -87,22 +75,11 @@ public class Promotion {
         this.nom = nom;
     }
 
-    public void setDate_debut(Date date_debut) {
+    public void setDate_debut(String date_debut) {
         this.date_debut = date_debut;
     }
 
-    public Button getButton() {
-        return button;
-    }
-
-    public void setButton(Button button) {
-        this.button = button;
-    }
-   /* public Timestamp setDate(Long date){
-    Timestamp ts = new Timestamp(date);
-    return ts;
-    }*/
-    public void setDate_fin(Date date_fin) {
+    public void setDate_fin(String date_fin) {
         
         this.date_fin = date_fin;
     }
@@ -113,7 +90,7 @@ public class Promotion {
 
     @Override
     public String toString() {
-        return "Promotion{" + "id=" + id + ", nom=" + nom + ", date_debut=" + date_debut + ", date_fin=" + date_fin + ", taux_reduction=" + taux_reduction + ", button=" + button + '}';
+        return "Promotion{" + "id=" + id + ", nom=" + nom + ", date_debut=" + date_debut + ", date_fin=" + date_fin + ", taux_reduction=" + taux_reduction +  '}';
     }
 
    

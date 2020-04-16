@@ -7,6 +7,9 @@ package pidev.views;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -68,7 +71,6 @@ public class TableController implements Initializable {
             }*/
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         load_promo();
         search_promo();
 

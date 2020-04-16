@@ -6,10 +6,17 @@
 package pidev.views;
 
 import com.gluonhq.charm.glisten.control.TextField;
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
+import java.io.IOException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -17,6 +24,7 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -26,8 +34,11 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.control.TextFormatter.Change;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import pidev.DAL.PromotionDao;
 import pidev.entities.Promotion;
+import static test.Pidev.SmsSender.ACCOUNT_SID;
+import static test.Pidev.SmsSender.AUTH_TOKEN;
 
 
 
@@ -55,19 +66,21 @@ public class AddPromoController implements Initializable {
     
     
     // ObservableList<Promotion> obspromolist2=FXCollections.observableArrayList();
+    @FXML
+    private AnchorPane root;
     
   
      
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-         tx_field.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
-         public void handle(KeyEvent keyEvent) {
-           if (!"0123456789".contains(keyEvent.getCharacter())) {
-             keyEvent.consume();
-           }
-         }
-       });
-         
+        tx_field.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
+      public void handle(KeyEvent keyEvent) {
+          if (!"0123456789".contains(keyEvent.getCharacter())) {
+           keyEvent.consume();
+          }
+        }
+      });
+        
           
     }
         private void clearField(){
@@ -78,18 +91,8 @@ public class AddPromoController implements Initializable {
 
     @FXML
     private void create_promo(MouseEvent event) {
-        //datetime picker
-        
-       
-       
-        if((name_field.getText().matches("[a-zA-Z]"))||(tx_field.getText().matches(("[0-9]")))){
-        Alert alert=new Alert(AlertType.INFORMATION);
-        alert.setTitle("Information Dialogue");
-        alert.setHeaderText(null);
-        alert.setContentText("Name or Taux!!");
-        alert.showAndWait();
-       }
-        else if(name_field.getText().isEmpty()||tx_field.getText().isEmpty()){
+     
+       if(name_field.getText().isEmpty()||tx_field.getText().isEmpty()){
         Alert alert=new Alert(AlertType.INFORMATION);
         alert.setTitle("Information Dialogue");
         alert.setHeaderText(null);
@@ -117,7 +120,9 @@ public class AddPromoController implements Initializable {
       else{
         list_show.getItems().clear();
         PromotionDao srvP=new PromotionDao();
-        Promotion p=new Promotion (name_field.getText(),java.sql.Date.valueOf(date_debut.getValue()),java.sql.Date.valueOf(date_fin.getValue()),Integer.parseInt(tx_field.getText()));
+        Timestamp ts = new  Timestamp (java.sql.Date.valueOf(date_debut.getValue()).getTime ());  
+        Timestamp ts2= new  Timestamp (java.sql.Date.valueOf(date_fin.getValue()).getTime ());  
+        Promotion p=new Promotion (name_field.getText(),ts.toString(),ts2.toString(),Integer.parseInt(tx_field.getText()));
         srvP.create(p);
         srvP.listPromo().stream().forEach((e) -> {list_show.getItems().add(e);});
         Alert alert=new Alert(AlertType.INFORMATION);
@@ -126,15 +131,26 @@ public class AddPromoController implements Initializable {
         alert.setContentText("promote has been created");
         alert.showAndWait();
         clearField();
+          Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
+
+        Message message = Message
+                .creator(new PhoneNumber("+216"), // to
+                        new PhoneNumber("+19893421855"), // from
+                        "Visit our online boutique Hunt Kingdom and explore the new discounts!!")
+                .create();
+
+        System.out.println(message.getSid());
        }       
      }
 
     @FXML
     private void update_promote(MouseEvent event) {
+        Timestamp ts = new  Timestamp (java.sql.Date.valueOf(date_debut.getValue()).getTime ());  
+        Timestamp ts2= new  Timestamp (java.sql.Date.valueOf(date_fin.getValue()).getTime ());  
         list_show.getItems().clear();
         PromotionDao srvP=new PromotionDao();
         //Promotion p=new Promotion (name_field.getText(),Integer.parseInt(tx_field.getText()));
-        srvP.updatePromo(name_field.getText(),Integer.parseInt(tx_field.getText()));
+        srvP.updatePromo(name_field.getText(),Integer.parseInt(tx_field.getText()),ts.toString(),ts2.toString());
         srvP.listPromo().stream().forEach((e) -> {list_show.getItems().add(e);});
         Alert alert=new Alert(AlertType.INFORMATION);
         alert.setTitle("Information Dialogue");
@@ -161,6 +177,16 @@ public class AddPromoController implements Initializable {
         clearField();
         
         
+    }
+
+    @FXML
+    private void back(MouseEvent event) {
+        try {
+            AnchorPane pane1 = FXMLLoader.load(getClass().getResource("Promote1.fxml"));
+            root.getChildren().setAll(pane1);
+        } catch (IOException ex) {
+            Logger.getLogger(LignePromoController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }

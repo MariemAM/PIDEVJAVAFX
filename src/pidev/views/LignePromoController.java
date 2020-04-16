@@ -6,11 +6,14 @@
 package pidev.views;
 
 import com.gluonhq.charm.glisten.control.TextField;
+import java.io.IOException;
 import static java.lang.Integer.parseInt;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -58,26 +61,20 @@ public class LignePromoController implements Initializable {
     PromotionDao p=new PromotionDao();
     Promotion prom=new Promotion();
     Produit e=new Produit();
+    @FXML
+    private AnchorPane root;
 
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
       fillComobox();
-      fillListView();
-      
-      
-      
-      
     
+     
     }    
     private void fillComobox(){for (Produit p:srvlp.returnProducts()){
       obspdtlist.add(p.getNom());}
       lst_product.setItems(obspdtlist);}
     
-    private void fillListView(){
-    for(String s:srvlp.returnLgPromo(prom.getId())){
-          obslplist.add(s);
-      lst_lp.setItems(obslplist);}}
     
      private Produit returnId(List<Produit> ls){
      String s=lst_product.getSelectionModel().getSelectedItem();
@@ -89,19 +86,19 @@ public class LignePromoController implements Initializable {
    
     
      public void load(Integer i) {
-         Promotion promo=p.FindOne(i);
+         Promotion promo=p.returnPromo(i);
          prom=promo;
          nom_label.setText(promo.getNom());
          label_datedbt.setText(promo.getDate_debut().toString());
          label_datef.setText(promo.getDate_fin().toString());
-         
-         //idpromo_label.setText(Integer.toString(promo.getId()));
-        //System.out.println(promo.toString());
-        
+         idpromo_label.setText(Integer.toString(promo.getId()));
+         for(String s:srvlp.returnLgPromo(promo.getId())){
+         obslplist.add(s);
+         lst_lp.setItems(obslplist);}
+           
         
      }
-     
-   
+    
     
     @FXML
     private void add_lp(MouseEvent event) {
@@ -111,16 +108,50 @@ public class LignePromoController implements Initializable {
        lp.setPromo(prom);
        lp.setQuantite(Integer.parseInt(qte_field.getText()));
        srvlp.create(lp);
-       fillListView();
+       for(String s:srvlp.returnLgPromo(prom.getId())){
+         obslplist.add(s);
+         lst_lp.setItems(obslplist);}
        
        
+    }
+   
+
+    @FXML
+    private void update_lp(MouseEvent event) {
+         lst_lp.getItems().clear();
+         Produit p=returnId(srvlp.returnProducts());
+         lp.setP(p);
+         lp.setPromo(prom);
+         lp.setQuantite(Integer.parseInt(qte_field.getText()));
+         srvlp.Updatelp(lp);
+         for(String s:srvlp.returnLgPromo(prom.getId())){
+         obslplist.add(s);
+         lst_lp.setItems(obslplist);}
+    }
+     @FXML
+    private void delete_lp(MouseEvent event) {
+        lst_lp.getItems().clear();
+        Produit p=returnId(srvlp.returnProducts());
+        lp.setP(p);
+        lp.setPromo(prom);
+        srvlp.deleteLgPromo(lp);
+         for(String s:srvlp.returnLgPromo(prom.getId())){
+         obslplist.add(s);
+         lst_lp.setItems(obslplist);}
+        
+        
     }
 
     @FXML
-    private void delete_lp(MouseEvent event) {
-        lst_lp.getItems().clear();
-        
-        
+    private void back(MouseEvent event) {
+        try {
+            AnchorPane pane1 = FXMLLoader.load(getClass().getResource("Promote1.fxml"));
+            root.getChildren().setAll(pane1);
+        } catch (IOException ex) {
+            Logger.getLogger(LignePromoController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
+
+   
     
 }
